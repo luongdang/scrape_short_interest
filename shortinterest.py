@@ -4,12 +4,13 @@ from datetime import datetime
 
 from itertools import groupby
 import locale
+import platform
 
 class ShortInterest:
     def __init__(self):
         self.name                  = None
         self.symbol                = None
-        self.curentShortInterest   = None
+        self.currentShortInterest  = None
         self.currentReportDate     = None
         self.previousShortInterest = None
         self.previousReportDate    = None
@@ -22,7 +23,7 @@ class ShortInterest:
         data = ShortInterest()
         data.name                  = columns[0].text
         data.symbol                = columns[1].text
-        data.curentShortInterest   = _tryConvert(locale.atoi, columns[2].text)
+        data.currentShortInterest  = _tryConvert(locale.atoi, columns[2].text)
         data.previousShortInterest = _tryConvert(locale.atoi, columns[3].text)
         data.percentOfFloat        = _tryConvert(locale.atof, columns[6].text)
         data.daysToCover           = _tryConvert(locale.atoi, columns[7].text)
@@ -39,10 +40,7 @@ class ShortInterest:
         for key, symbols in groupby(symbols, lambda sym: sym[0].upper()):
             symbolGroups[key] = list(symbols)
 
-        options = webdriver.ChromeOptions()
-        options.add_argument("headless")
-        driver = webdriver.Chrome(executable_path="./chromedriver_mac", options=options)
-        
+        driver  = _getChromeDriver()
         results = []
         for key, symbols in symbolGroups.items():
             url = f"http://www.wsj.com/mdc/public/page/2_3062-shtnyse_{key}-listing.html"
@@ -64,10 +62,26 @@ class ShortInterest:
                     interest = ShortInterest.__createFromColumns(columns, currentReportDate, previousReportDate)
                     results.append(interest)
 
+        driver.quit()
         return results
 
-def _tryConvert(convertFunc, str):
+def _tryConvert(convertFunc, str, defaultValue=None):
     try:
         return convertFunc(str)
     except ValueError:
-        return None
+        return defaultValue
+
+def _getChromeDriver():
+    osName = platform.system()
+    if osName == "Darwin":
+        driverPath = "drivers/chromedriver_mac64"
+    elif osName == "Windows":
+        driverPath = "drivers/chromedriver_win32"
+    elif osName == "Linux":
+        driverPath = "drivers/chromedriver_linux64"
+    else:
+        raise Exception(f"No Chrome driver for platform '{osName}'")
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("headless")
+    return webdriver.Chrome(executable_path=driverPath, options=options)
