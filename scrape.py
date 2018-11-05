@@ -1,7 +1,10 @@
 from shortinterest import ShortInterest
 from xlsxwriter import Workbook
 
+# Scrape the data from the WSJ
 results = ShortInterest.scrape(exchanges=["nyse"], keys=["A"])
+
+# Export to Excel
 book = Workbook("ShortInterest.xlsx")
 sheet = book.add_worksheet()
 
