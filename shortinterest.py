@@ -14,6 +14,7 @@ class ShortInterest:
         # Python has no pre-declaration of properties. This initializer does
         # nothing but introduces instance properties of the `ShortInterest`
         # class so that the IDE can help us check for typos.
+        self.exchange              = None
         self.name                  = None
         self.symbol                = None
         self.currentShortInterest  = None
@@ -25,7 +26,7 @@ class ShortInterest:
         self.averageDailyVolume    = None
 
     @classmethod
-    def __createFromColumns(cls, columns, currentReportDate, previousReportDate):
+    def __createFromColumns(cls, columns):
         """
          Create a `ShortInterest` object from the contents of the specified columns.
          """
@@ -38,10 +39,6 @@ class ShortInterest:
         interest.percentOfFloat        = _toFloat(columns[6].text)
         interest.daysToCover           = _toFloat(columns[7].text)
         interest.averageDailyVolume    = _toFloat(columns[8].text)
-        #
-        interest.currentReportDate     = currentReportDate
-        interest.previousReportDate    = previousReportDate
-
         return interest
 
     @classmethod
@@ -62,10 +59,12 @@ class ShortInterest:
 
         # The `product` function produces all possible combinations between the
         # elements in the two arrays. We use it as a replacement for nested
-        # loop. It is functionally equivalent to:
+        # loops. It is functionally equivalent to:
+        #
         #   for exchange in exchanges:
         #       for key in keys:
         #           ...
+        #
         for exchange, key in product(exchanges, keys):
             url = f"http://www.wsj.com/mdc/public/page/2_3062-sht{exchange}_{key}-listing.html"
             print(f"Scraping for '{exchange}', '{key}': {url}")
@@ -79,10 +78,6 @@ class ShortInterest:
                 html = driver.find_element(By.CSS_SELECTOR, "table.mdcTable").get_attribute("innerHTML")
                 table = BeautifulSoup(html, "html.parser")
 
-                # table.mdcTable is the CSS selector for "the <table> element
-                # with class mdcTable"
-                # table = soup.select_one("table.mdcTable")
-
                 # This is Python tuple-spread syntax:
                 #     x, y = 1, 2
                 # means the same thing as:
@@ -91,12 +86,12 @@ class ShortInterest:
                 currentReportDate, previousReportDate = None, None
                 count = 0
 
-                # `enumerate` allows us to get both the index and the element
-                # of an array. For example:
+                # `enumerate` allows us to get both the index and the element of
+                # an array. For example...:
                 #       for index, char in ["A", "B", "C"]:
                 #
-                # Will iterate through (index=0, char="A"), (index=1, char="B"),
-                # (index=2, char = "C")
+                # ... will iterate through (index=0, char="A"), (index=1,
+                # char="B"), (index=2, char = "C")
                 for index, row in enumerate(table.select("tr")):
                     columns = row.select("td")
 
@@ -105,8 +100,12 @@ class ShortInterest:
                         currentReportDate  = datetime.strptime(columns[2].text, formatString)
                         previousReportDate = datetime.strptime(columns[3].text, formatString)
                     else:
+                        interest = ShortInterest.__createFromColumns(columns)
+                        interest.currentReportDate  = currentReportDate
+                        interest.previousReportDate = previousReportDate
+
+                        results.append(interest)
                         count += 1
-                        results.append(ShortInterest.__createFromColumns(columns, currentReportDate, previousReportDate))
 
                 print(f"Scraped {count} symbols")
             except:
