@@ -5,10 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File (Integrated Terminal)",
+            "name": "Workspace",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/scrape.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Current file",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
             "console": "integratedTerminal"
         },
         {
@@ -17,13 +24,6 @@
             "request": "attach",
             "port": 5678,
             "host": "localhost"
-        },
-        {
-            "name": "Python: Module",
-            "type": "python",
-            "request": "launch",
-            "module": "enter-your-module-name-here",
-            "console": "integratedTerminal"
         },
         {
             "name": "Python: Django",
