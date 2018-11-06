@@ -46,19 +46,29 @@ class ShortInterest:
 
     @classmethod
     def scrape(cls, exchanges=["nyse", "nasdaq", "amex"], keys=None):
-        # A `driver` allows us to drive Chrome from Python. To the WSJ, this is
-        # indistinguiable from a user manually visiting the page.
+        # A `driver` allows us to drive Chrome from Python. To the WSJ, this
+        # is indistinguiable from a user manually visiting the page.
         driver = _getChromeDriver()
 
-        # A list containing the letters "a" to "z", plus the string "0-9"
+        # If the user does not provide a list of key, use the default list,
+        # which contains the letters "a" to "z", plus the string "0-9"
         if keys is None:
             keys = list(string.ascii_uppercase) + ['0_9']
+        else:
+            keys = map(keys, lambda k: k.upper())
 
-        # The result of the scrape
+        # A variable to hold the result of the scrape
         results = []
+
+        # The `product` function produces all possible combinations between the
+        # elements in the two arrays. We use it as a replacement for nested
+        # loop. It is functionally equivalent to:
+        #   for exchange in exchanges:
+        #       for key in keys:
+        #           ...
         for exchange, key in product(exchanges, keys):
             url = f"http://www.wsj.com/mdc/public/page/2_3062-sht{exchange}_{key}-listing.html"
-            print(f"Scraping from {url}")
+            print(f"Scraping for '{exchange}', '{key}': {url}")
 
             # Open the page in Chrome. We are driving Chrome from Python
             driver.get(url)
@@ -81,6 +91,12 @@ class ShortInterest:
                 currentReportDate, previousReportDate = None, None
                 count = 0
 
+                # `enumerate` allows us to get both the index and the element
+                # of an array. For example:
+                #       for index, char in ["A", "B", "C"]:
+                #
+                # Will iterate through (index=0, char="A"), (index=1, char="B"),
+                # (index=2, char = "C")
                 for index, row in enumerate(table.select("tr")):
                     columns = row.select("td")
 
@@ -120,8 +136,10 @@ def _getChromeDriver():
 
     options = webdriver.ChromeOptions()
 
-    # Add the headless option if you don't want Chrome to show up or when you
-    # are doing it on an Amazon EC2 instance
+    # Activate the headless option if you don't want Chrome to show up or if
+    # you are doing it on an Amazon EC2 instance.
     # options.add_argument("headless")
     
-    return webdriver.Chrome(executable_path=driverPath, options=options)
+    driver = webdriver.Chrome(executable_path=driverPath, options=options)
+    driver.implicitly_wait = 10
+    return driver

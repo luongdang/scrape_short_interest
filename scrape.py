@@ -2,8 +2,13 @@ from shortinterest import ShortInterest
 from xlsxwriter import Workbook
 
 # Scrape the data from the WSJ
-results = ShortInterest.scrape(exchanges=["nyse"], keys=["A"])
+# Scrape only page A, B, C from nyse
+# results = ShortInterest.scrape(exchanges=["nyse"], keys=["A", "B", "C"])
 
+# Scrape everything: A - Z and 0-9 on all 3 exchanges
+results = ShortInterest.scrape()
+
+# -----------------------------------------------------------------------------
 # Export to Excel
 book = Workbook("ShortInterest.xlsx")
 sheet = book.add_worksheet()
