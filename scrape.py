@@ -80,7 +80,14 @@ def scrape(exchanges=None, keys=None):
             table = BeautifulSoup(html, "html.parser")
 
             for index, row in enumerate(table.select("tr")):
-                # Read up on "Python List Comprehension"
+                # This is known as Python's list comprehension:
+                #   results = [item.doSomething() for item in list]
+                #
+                # It's equivalent to:
+                #   results = []
+                #   for item in list:
+                #       results.append(item.doSomething())
+                #
                 rowData = [col.get_text(" ", strip=True) for col in row.select("td")]
 
                 if index == 0:
