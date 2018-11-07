@@ -5,6 +5,7 @@ Scrape [short interest data][1] from the Wall Street Journal.
 ## Prerequisites
 
 Make sure you have the following components installed:
+
 1. [Anaconda][2]: a Python distribution that's geared toward data science. Download the latest version of Python 3.x. This script was develeloped and tested under Python 3.7
 2. The [Chrome][3] browser.
 3. [Visual Studio Code][4] (for your development machine only).
