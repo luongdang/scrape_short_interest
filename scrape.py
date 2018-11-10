@@ -146,4 +146,8 @@ def export(filePath, dataFrame):
 
 # Eliminate one or both parameters to scrape for everything
 data = scrape(exchanges=["nyse"], keys=["A", "0_9"])
+
+# Scrape everything
+# data = scrape()
+
 export("ShortInterest.xlsx", data)
