@@ -1,4 +1,13 @@
 {
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    // flake8 linter config
+    "python.linting.flake8CategorySeverity.E": "Warning",
+    "python.linting.flake8CategorySeverity.F": "Warning",
+    "python.linting.flake8Args": [
+        // E501 = line too long
+        // W293 = blank link contain whitespace
+        "--ignore=E501,W293"
+    ]
 }

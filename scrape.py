@@ -1,15 +1,18 @@
 from bs4 import BeautifulSoup
 from itertools import product
-from locale import atof
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from xlsxwriter import Workbook
 
-import numpy as np
+# The `noqa` directive tells the linter to not generate warning F401 (imported
+# but not used) for numpy because we can't use `pandas` without importing
+# `numpy`. But this script does not use any function from the `numpy` module
+# directly.
+import numpy as np      # noqa: F401
 import pandas as pd
 import platform
 import string
 import sys
+
 
 def getChromeDriver():
     # Selenium provides a different driver for each operating system
@@ -47,9 +50,10 @@ def toFloat(series):
     * Decimal digits only: '600'
     * Decimal digits with thousand separator: '12,000'
     * Placeholder for empty values: '---'
-    
+
     The first type can be easiy converted to float. The second type must have
-    its commas removed first. The third type will result in NaN (not a number).
+    its commas removed first. When we specify `errors="coerce`, the third type
+    will result in NaN (not a number).
     """
     return pd.to_numeric(series.str.replace(",", ""), errors="coerce")
 
@@ -58,12 +62,12 @@ def scrape(exchanges=None, keys=None):
     # If user did not specify a list of exchanges, scrape all exchanges
     if exchanges is None:
         exchanges = ["nyse", "nasdaq", "amex"]
-    
+
     # If use did not specify a list of keys, scrape all keys: all letters "A" to
     # "Z", plus the string "0_9"
     if keys is None:
         keys = list(string.ascii_uppercase) + ["0_9"]
-    
+
     driver = getChromeDriver()
     headers = None
     data = []
@@ -140,9 +144,10 @@ def scrape(exchanges=None, keys=None):
 
 
 def export(filePath, dataFrame):
-    writer = pd.ExcelWriter(filePath, engine="xlsxwriter")
+    writer = pd.ExcelWriter(filePath)
     dataFrame.to_excel(writer, sheet_name="Sheet1", index=False)
     writer.save()
+
 
 # Eliminate one or both parameters to scrape for everything
 data = scrape(exchanges=["nyse"], keys=["A", "0_9"])

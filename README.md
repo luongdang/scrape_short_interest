@@ -24,7 +24,7 @@ To circumvent this restriction, we need to drive a browser from Python, i.e. tel
 
 ```bash
 # Install Selenium
-pip install selenium
+conda install selenium
 ```
 
 ## Usage
